@@ -13,7 +13,7 @@ Current Features:
 
 Example setup:
          
-LCD_4BIT<D0,D1,D4,D7,LCD1602> LCD;
+LCD_4BIT<D0,D1,D4,D7,LCD1602> lcd;
 
 First  - Enable Pin
 Second - Register Select
@@ -29,8 +29,8 @@ For Arduino Uno
     recommended combinations
 DataBus4 - DataBus7  
        D8-D11
-		   A0-A3
-		   D0-D3
+       A0-A3
+       D0-D3
        D4-D7
     
 For the Arduino 
@@ -45,7 +45,7 @@ For the Arduino
 		A0-A3
 		A4-A7
   
-  	other possible combinations
+  other possible combinations
 		D37-D34 , D33-D30
 		D53-D50
 		D10-D13
