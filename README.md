@@ -33,7 +33,7 @@ For Arduino Uno
             D0-D3
             D4-D7   
        
-For the Arduino 
+For the Arduino MEGA
 
 	recommended combinations
 		
