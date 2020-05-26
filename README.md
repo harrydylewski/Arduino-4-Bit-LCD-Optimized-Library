@@ -28,13 +28,16 @@ D5 and D6 don't need to be declared, the software handles the rest
 For Arduino Uno
     recommended combinations
 DataBus4 - DataBus7  
+```
        D8-D11
        A0-A3
        D0-D3
        D4-D7
+       ```
     
 For the Arduino 
 		recommended combinations
+		```
 		D37-D34
 		D33-D30
 		D53-D50
@@ -44,8 +47,10 @@ For the Arduino
 		D26-D29
 		A0-A3
 		A4-A7
+		```
   
   other possible combinations
+  		```
 		D37-D34 , D33-D30
 		D53-D50
 		D10-D13
@@ -55,6 +60,7 @@ For the Arduino
 		D6,D9
 		A8-11, A12-A15
 		D49-D46, D45-D42
+		```
     
     
     
