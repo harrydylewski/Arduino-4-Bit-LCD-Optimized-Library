@@ -1,7 +1,6 @@
 #pragma once
-#include "avr_gpio_template.h"
 
-#include "bin2bcd.h"
+#include "avr_gpio_template.h"
 
 #include <stdint.h>
 
@@ -9,13 +8,16 @@ const uint8_t DELAY40US = 40;
 
 const uint8_t SELECT4BIT = 0x30;
 
+//used with calculateCursorPosition to make sure the cursor
+//goes the right location
 enum LCDLAYOUT :uint8_t {LCD1602,LCD1604,LCD2002,LCD2004};
 
 template<PINS EN, PINS RS, PINS d4, PINS d7, LCDLAYOUT colrow>
-class LCD_4BIT// : BIN2BCD
+class LCD_4BIT_SP
 {
 	private:
-		
+	
+	//
 	LCDLAYOUT _layout=colrow;
 		
 	GPIO<EN> _en;
@@ -23,17 +25,30 @@ class LCD_4BIT// : BIN2BCD
 
 	PORT<d4,d7> _port;
 	
+	/*
+	display register gets variable because multiple functions
+	(blinking/display on / cursor on)
+	are in the same register so it's difficult keep track of 
+	what features are turned on and off without being explicit with all of them 
+	I.E 
+	cmd(DISPLAYON|BLINKON|CURSORFF)
+	vs
+	_displaycontrol &=~ CURSORON;
+	cmd(_displaycontrol)
+	*/
+	uint8_t _displaycontrol=0x28; //display, blink, cursor are on by default
+	
 	void config4bit(void)
 	{
 		_en.on();
 		_port.write(3); //write function set register
 		_en.off();
-		_delay_ms(5);
+		_delay_ms(3);
 		
 		_en.on();
 		_port.write(3); //write function set register
 		_en.off();
-		_delay_ms(5);
+		_delay_ms(3);
 		
 		_en.on();
 		_port.write(3); //write function set register
@@ -128,18 +143,25 @@ class LCD_4BIT// : BIN2BCD
 	CLEAR=1,
 	RETURN=2,
 	//--------------------
-	CURSORLEFT=0x10,
-	CURSORRIGHT=0x14,
-	SHIFTLEFT =0x18,
-	SHIFTRIGHT=0x1C,
+	ENTRY_BIT=0x04,
+	WRITELEFT=0x02,
+	SHIFTON=0x01,
+	//--------------------
+	CURSOR_BIT   = 0x10,
+	CURSORLEFT  = 0x10,
+	CURSORRIGHT = 0x14,
+	SHIFTLEFT   = 0x18,
+	SHIFTRIGHT  = 0x1C,
 	//----------------------
-	DISPLAY=0x08,
-	BLINKON=0x01,
-	CURSORON=0x02,	
-	DISPLAYON=0x04,
+	DISPLAY_BIT  = 0x08,
+	BLINKON      = 0x01,
+	CURSORON     = 0x02,	
+	DISPLAYON    = 0x04,
+	
+	DISPLAY_ALLON = 0x0F,
 	//----------------------
-	DISPLAY_ALLON=0x0F,
-	DDRAM=0x80
+	CGDRAM_BIT     = 0x40,
+	DDRAM_BIT      = 0x80
 	};
 	
 	LCD_4BIT()
@@ -510,50 +532,92 @@ class LCD_4BIT// : BIN2BCD
 	}
 	
 	//---------------------------------------------
+	/*
+	  void autoscroll();
+	  void noAutoscroll();
+	  */
 	
-	void clear()
-	{
-		_rs.off();
+	void clear() {
 		cmd(CLEAR);
-		_delay_ms(30);
+		_delay_ms(3);
+	}	
+	
+	void home()	{
+		cmd(RETURN);  // set cursor position to zero
+		_delay_ms(3);  // this command takes a long time!
+	}
+	//Display Register Related Functions------------
+	
+	void noDisplay() {
+		_displaycontrol &= ~DISPLAYON;
+		cmd(DISPLAY_BIT | _displaycontrol);
+	}
+	void display() {
+		_displaycontrol |= DISPLAYON;
+		cmd(DISPLAY_BIT | _displaycontrol);
 	}
 	
-	void scrollRight()
-	{
-		_rs.off();
-		cmd(SHIFTRIGHT);
+	void noCursor() {		
+		_displaycontrol  &=~ CURSORON;
+		cmd(DISPLAY_BIT  | _displaycontrol);
 	}
 	
-	void scrollLeft()
-	{
-		_rs.off();
+	void cursor() {
+		_displaycontrol  |= CURSORON;
+		cmd(DISPLAY_BIT  | _displaycontrol);
+	}
+		
+	void noBlink() {
+		 _displaycontrol &= ~BLINKON;
+		cmd(DISPLAY_BIT | _displaycontrol);
+	}
+	
+	void blink() {
+		_displaycontrol |= BLINKON;
+		cmd(DISPLAY_BIT | _displaycontrol);
+	}	
+
+	//Cursor or shifting functions
+	void scrollDisplayLeft(void) {
 		cmd(SHIFTLEFT);
 	}
-	
-	void cursorRight()
-	{
-		_rs.off();
+	void scrollDisplayRight(void) {
+		cmd(SHIFTRIGHT);
+	}
+		
+	void cursorRight() {
 		cmd(CURSORRIGHT);
 	}
-	
-	void cursorLeft()
-	{
-		_rs.off();
+		
+	void cursorLeft() {
 		cmd(CURSORRIGHT);
 	}
+	//----------------------------------------
 	
+	void leftToRight(void) {
+		cmd(ENTRY_BIT | WRITELEFT);
+	}
+
+	void rightToLeft(void) {
+		cmd(ENTRY_BIT);
+	}
+	//----------------------------------------
 	void setCursor(uint8_t x, uint8_t y)
 	{		
-		_rs.off();
 		cmd(calculateCursorPosition(x,y));	
 	}
 	//---------------------------------------------
-
+	void createChar(uint8_t location, uint8_t * charmap) {
+		location &= 0x7; // we only have 8 locations 0-7
+		cmd(CGDRAM_BIT | (location << 3));
+		for (uint8_t i=0; i<8; i++) {
+			write(charmap[i]);
+		}
+	}
 		
 };
 	
-	
-	//code sourced from
+	//code for number printing comes from
 	//https://www.avrfreaks.net/forum/smallest-and-fastest-binary-bcd-conversion?page=all
 	/*
 	void bin2bcd( unsigned int val )
