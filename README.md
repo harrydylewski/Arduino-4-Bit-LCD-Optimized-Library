@@ -28,12 +28,13 @@ Example setup Single Port
 
 LCD_4BIT_SP<D0,D1,D4,D7,LCD1602> lcd;
 
-First  - Enable Pin
-Second - Register Select
-Third  - D4 of the DataBus
-Fourth - D7 of the DataBus
-Fifth  - Column and row size, use LCD1602, LCD2002, LCD1604, LCD 2004
-         Primarily used to make sure that whatever enters the setCursor function is valid
+*First  - Enable Pin
+*Second - Register Select
+*Third  - D4 of the DataBus
+*Fourth - D7 of the DataBus
+*Fifth  - Column and row size, use LCD1602, LCD2002, LCD1604, LCD 2004
+        * Primarily used to make sure that whatever enters the setCursor function is valid
+
 
 D5 and D6 don't need to be declared, the software handles the rest.
 
