@@ -10,21 +10,21 @@ There are two verions, single and multi port.
 Single port assumes the pins are on the same port which allows for faster writes. There are also limitations on which pins are usable.
 Multi port assumes all pins are on different ports for slower writes, but faster than Digital writes.
 
-Which to use?
+Which to use?  
 
-If you want maximum compatibility between UNO and MEGA, use the multiport version.
-If you know all the digital pins you're using are on the same port, then use the single port version.
+If you want maximum compatibility between UNO and MEGA, use the multiport version.  
+If you know all the digital pins you're using are on the same port, then use the single port version.  
 
-In the avr_gpio_template.h you have to define whether you're using UNO or MEGA so the pins are assigned properly.
+In the avr_gpio_template.h you have to define whether you're using UNO or MEGA so the pins are assigned properly.  
 
-Testing was done with an arduino uno clone and a regular 1602 LCD screen in 4 bit mode with the same pinout as the dfrobot LCD + analog buttons combo shield.
+Testing was done with an arduino uno clone and a regular 1602 LCD screen in 4 bit mode with the same pinout as the dfrobot LCD + analog buttons combo shield.  
 
-Current Tested Features:  
+Current Tested Features:   
  [x]Printing text   
  [x]Printing 8,16,32bit numbers  
  [x]setCursor function  
 
-To Do
+To Do  
  []Printing floats (this'll take a while...)  
  []Printing from flash  
  []Testing on MEGA  
@@ -40,8 +40,8 @@ LCD_4BIT_SP<D0,D1,D4,D7,LCD1602> lcd;
 2) Register Select
 3) D4 of the DataBus
 4) D7 of the DataBus
-5) Column and row size, use LCD1602, LCD2002, LCD1604, LCD 2004
-   Primarily used to make sure that whatever enters the setCursor function is valid
+5) Column and row size, use LCD1602, LCD2002, LCD1604, LCD 2004   
+Primarily used to make sure that whatever enters the setCursor function is valid
 
 
 D5 and D6 don't need to be declared, the software handles the rest.
