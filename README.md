@@ -27,7 +27,7 @@ Example setup Single Port
 #include "arduino_4bit_lcd_singleport.h"
 
 LCD_4BIT_SP<D0,D1,D4,D7,LCD1602> lcd;
-
+###
 *First  - Enable Pin
 *Second - Register Select
 *Third  - D4 of the DataBus
