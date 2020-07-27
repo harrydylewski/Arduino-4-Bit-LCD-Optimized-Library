@@ -17,10 +17,18 @@ If you know all the digital pins you're using are on the same port, then use the
 
 In the avr_gpio_template.h you have to define whether you're using UNO or MEGA so the pins are assigned properly.
 
+Testing was done with an arduino uno clone and a regular 1602 LCD screen in 4 bit mode with the same pinout as the dfrobot LCD + analog buttons combo shield.
+
 Current Tested Features:
-  Printing text 
-  Printing 8,16,32bit numbers
-  setCursor function
+ [x]Printing text 
+ [x]Printing 8,16,32bit numbers
+ [x]setCursor function
+
+To Do
+ []Printing floats (this'll take a while...)
+ []Printing from flash
+ []Testing on MEGA
+ []Print Binary+Hex
 
 Example setup Single Port
 
