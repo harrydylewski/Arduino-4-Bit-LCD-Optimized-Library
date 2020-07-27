@@ -4,7 +4,8 @@ WIP - Beta
 
 This library optimizes a lot of bit mangling normally used by the arduino library through digital writes. 
 However there's still a lot more work to be done. For now the library is using the same function name
-scheme of the arduino's LCD library to maintain drop in compability.
+scheme of the arduino's LCD library to maintain drop in compability. Printing 8/16/32 bit numbers are 
+also optimized to convert from binary to to ASCII faster than a standard itoa/utoa.
 
 There are two verions, single and multi port.
 Single port assumes the pins are on the same port which allows for faster writes. There are also limitations on which pins are usable.
@@ -14,6 +15,8 @@ Which to use?
 
 If you want maximum compatibility between UNO and MEGA, use the multiport version.  
 If you know all the digital pins you're using are on the same port, then use the single port version.  
+
+The single port version is faster, 5 cycles if the data pins are on the low 4 bits of a port, 7 on the high 4 bits of a port. Anywhere in between will add more cycles due to shifting. Multiple port writes will always be between 16-20 cycles. 
 
 In the avr_gpio_template.h you have to define whether you're using UNO or MEGA so the pins are assigned properly.  
 
