@@ -164,7 +164,7 @@ class LCD_4BIT_SP
 	DDRAM_BIT      = 0x80
 	};
 	
-	LCD_4BIT()
+	LCD_4BIT_SP()
 	{
 		_port.setOutput();
 		_en.setOutput();
