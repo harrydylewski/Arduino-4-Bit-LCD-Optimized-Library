@@ -12,8 +12,8 @@ const uint8_t SELECT4BIT = 0x30;
 //goes the right location
 enum LCDLAYOUT :uint8_t {LCD1602,LCD1604,LCD2002,LCD2004};
 
-template<PINS EN, PINS RS, PINS d4, PINS d7, LCDLAYOUT colrow>
-class LCD_4BIT_SP
+template<PINS EN, PINS RS, PINS d4, PINS d5, PINS d6, PINS d7, LCDLAYOUT colrow>
+class LCD_4BIT_MP
 {
 	private:
 	
@@ -23,7 +23,10 @@ class LCD_4BIT_SP
 	GPIO<EN> _en;
 	GPIO<RS> _rs;
 
-	PORT<d4,d7> _port;
+	GPIO<d4> _d4;
+	GPIO<d5> _d5;
+	GPIO<d6> _d6;
+	GPIO<d7> _d7;
 	
 	/*
 	display register gets variable because multiple functions
@@ -41,32 +44,32 @@ class LCD_4BIT_SP
 	void config4bit(void)
 	{
 		_en.on();
-		_port.write(3); //write function set register
+		write4b(3); //write function set register
 		_en.off();
 		_delay_ms(3);
 		
 		_en.on();
-		_port.write(3); //write function set register
+		write4b(3); //write function set register
 		_en.off();
 		_delay_ms(3);
 		
 		_en.on();
-		_port.write(3); //write function set register
+		write4b(3); //write function set register
 		_en.off();
 		_delay_ms(3);
 		
 		_en.on();
-		_port.write(2); //enable 4 bit mode
+		write4b(2); //enable 4 bit mode
 		_en.off();
 		_delay_us(DELAY40US);
 
 		_en.on();
-		_port.write(2); //enable 4 bit mode
+		write4b(2); //enable 4 bit mode
 		_en.off();
 		_delay_us(DELAY40US);		
 		
 		_en.on();
-		_port.write(8); //enable two lines
+		write4b(8); //enable two lines
 		_en.off();
 		_delay_us(DELAY40US);
 		
@@ -123,16 +126,41 @@ class LCD_4BIT_SP
 			
 			return position;
 	}
-
+	
+	void write4b(uint8_t input)
+	{
+		/*
+		THIS METHOD IS INTENTIONAL
+		speed of this is between 16-20 cycles
+		16 - all false
+		20 - all true
+		d5 and d6 set on by default
+		because characters will most likely
+		have these bits set		
+		*/
+		_d4.off();
+		_d5.on();
+		_d6.on();
+		_d7.off();
+		
+		if(input&1)
+		_d4.on();
+		if(input&2)
+		_d5.off();
+		if(input&4)
+		_d6.off();
+		if(input&8)
+		_d7.on();		
+	}
+	
 	void write(uint8_t input)
 	{
 		_en.on();
-		_port.write((input>>4)&0x0F);
+		write4b((input>>4)&0x0F);
 		_en.off();
-		//_delay_us(DELAY40US);
 		
 		_en.on();		
-		_port.write(input&0x0F);
+		write4b(input&0x0F);
 		_en.off();
 		_delay_us(DELAY40US);
 	}
@@ -164,9 +192,12 @@ class LCD_4BIT_SP
 	DDRAM_BIT      = 0x80
 	};
 	
-	LCD_4BIT()
+	LCD_4BIT_MP()
 	{
-		_port.setOutput();
+		 _d4.setOutput();
+		 _d5.setOutput();
+		 _d6.setOutput();
+		 _d7.setOutput();
 		_en.setOutput();
 		_en.off();
 		_rs.setOutput();
@@ -224,7 +255,7 @@ class LCD_4BIT_SP
 		
 		uint8_t output = 255;
 		uint8_t totalzeroes = 0;
-		
+	
 		/*
 		For unsigned numbers
 		subtract 100
@@ -261,6 +292,12 @@ class LCD_4BIT_SP
 		*/
 		output = 10;	
 		
+		if(input>=50)
+		{
+			input+=50;
+			output=5;
+		}
+		
 		do
 		output--;
 		while( (input += 10) & 0x80 );
@@ -274,7 +311,7 @@ class LCD_4BIT_SP
 		//least digit is always printed
 		write(input+'0');	
 		
-		//print leading zeroes as spaces at the end
+		//print leading zeros as spaces at the end
 		while(totalzeroes--)					
 		{
 			write(' ');
@@ -335,7 +372,7 @@ class LCD_4BIT_SP
 		//3rd digit printed
 		//---------------------------------
 		output = 10;
-		
+				
 		do
 		output--;
 		while( (input += 10) & 0x8000 );
@@ -356,7 +393,7 @@ class LCD_4BIT_SP
 		}
 	}
 	
-	//leadless expanding right
+	//lead less expanding right
 	
 	void print(int16_t input)
 	{
