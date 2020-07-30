@@ -222,23 +222,27 @@ class LCD_4BIT_SP
 		
 		_rs.on();
 		
-		uint8_t output = 255;
+		/*
+		output starts -1 because this code
+		will count down until the input is
+		negative or posivitive, which acts an additional +1
+		*/
+		int8_t output = -1;
 		uint8_t totalzeroes = 0;
 		
 		/*
 		For unsigned numbers
-		subtract 100
-		until MSB is clear
+		subtract 100 so MSB is clear
 		*/
 		
-		while(input>=0x80)
+		if(input>=0x80)
 		{
 			input-=100;
 			output++;
 		}
 		
 		/*
-		Auto Subtract 100 
+		Subtract 100 
 		until MSB is clear from underflow
 		*/
 		
@@ -255,10 +259,10 @@ class LCD_4BIT_SP
 		
 		//---------------------------------						
 		/*
-		same as above
-		now we add 10
+		add 10
 		until MSB is set
 		*/
+		
 		output = 10;	
 		
 		do
@@ -294,10 +298,10 @@ class LCD_4BIT_SP
 		until MSB is clear
 		*/
 		
-		while(input>=0x8000)
+		if(input>=0x8000)
 		{
-			input-=10000;
-			output++;
+			input-=30000;
+			output+=3;
 		}
 		
 		do
@@ -382,10 +386,10 @@ class LCD_4BIT_SP
 		uint8_t totalzeroes=0; 	
 		uint8_t output = 255;
 		
-		while(input>=0x80000000)
+		if(input>=0x80000000)
 		{
-			input -=1000000000;
-			output++;
+			input -=2000000000;
+			output+=2;
 		}
 			
 		do
