@@ -294,8 +294,8 @@ class LCD_4BIT_SP
 		
 		/*
 		For unsigned numbers
-		subtract 100000
-		until MSB is clear
+		if MSB is set
+		subtract 300000		
 		*/
 		
 		if(input>=0x8000)
